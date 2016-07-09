@@ -16,7 +16,7 @@ void clear_output_text_file(graphnode * g)
 {
 	std::ofstream ofs; 
 	// the ofstream::trunc option deletes the content before writing anything in 
-	ofs.open("venmo-trans-output.txt", std::ofstream::out | std::ofstream::trunc);  
+	ofs.open("output.txt", std::ofstream::out | std::ofstream::trunc);  
 //	ofs << g->getLatestMedian(); 
 
 	ofs.close(); 
@@ -30,7 +30,7 @@ void writeMedianToOutputFile(graphnode * g)
 	double fractpart = modf(median, &intpart);
 	fractpart = roundf(fractpart * 1000.0) / 1000.0;
 	double medianFinal = intpart + fractpart; 
-	ofs.open("venmo-trans-output.txt", std::ios_base::app); // appends to text file.  
+	ofs.open("output.txt", std::ios_base::app); // appends to text file.  
 	ofs << std::fixed << std::setprecision(2) << medianFinal << std::endl; // so every median is in x.xx format . 
 	ofs.close(); 
 }
