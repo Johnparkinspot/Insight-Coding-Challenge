@@ -11,7 +11,7 @@
 
 int counter = 0; 
 
-// will only store the LATEST median number in the output file. 
+// clears the output text file before anything is written into it (called at the beginning of the program) 
 void clear_output_text_file(graphnode * g)
 {
 	std::ofstream ofs; 
