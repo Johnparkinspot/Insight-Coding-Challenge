@@ -79,7 +79,7 @@ bool isWithin60(timeStamp t1, timeStamp t2)
 	tt1 = mktime(&time1);
 	tt2 = mktime(&time2);
 
-	if (tt2 - tt1 <= 60 && tt2-tt1 >= 0) // tt2 - tt1 is the difference in SECONDS 
+	if (tt2 - tt1 < 60 && tt2-tt1 >= 0) // tt2 - tt1 is the difference in SECONDS 
 		return true;
 	else
 		return false; 
