@@ -17,7 +17,6 @@ void clear_output_text_file(graphnode * g)
 	std::ofstream ofs; 
 	// the ofstream::trunc option deletes the content before writing anything in 
 	ofs.open("output.txt", std::ofstream::out | std::ofstream::trunc);  
-//	ofs << g->getLatestMedian(); 
 
 	ofs.close(); 
 }
