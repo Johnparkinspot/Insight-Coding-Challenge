@@ -79,7 +79,7 @@ bool isWithin60(timeStamp t1, timeStamp t2)
 	tt1 = mktime(&time1);
 	tt2 = mktime(&time2);
 
-	if (tt2 - tt1 < 60 && tt2-tt1 >= 0) // tt2 - tt1 is the difference in SECONDS 
+	if ((tt2 - tt1 < 60 && tt2 - tt1 >= 0) || (tt2-tt1 > -60 && tt2-tt1 <= 0)) // tt2 - tt1 is the difference in SECONDS 
 		return true;
 	else
 		return false; 
@@ -175,7 +175,7 @@ void graphnode::add_edge(string key, string link)
 		this->insert_vertex(link); 
 	}
 
-	if (already_in(key) && already_in(link) && !already_edge(key, link))
+	if (already_in(key) && already_in(link) && !already_edge(key, link) && isWithin60(timestamps[timestamps.size()-1],latestTimeStamp))
 	{
 		// form first edge
 		for (int i = 0; i < nodeandedge.size(); ++i)
