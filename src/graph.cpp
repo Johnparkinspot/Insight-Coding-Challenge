@@ -392,6 +392,8 @@ void graphnode::store_timestamp(string timestamp)
 		//std::cout << latestTimeStamp << std::endl; 
 }
 
+
+
 void graphnode::removeEdgesLessThanLatestTimeStamp()
 {
 	timeStamp latest(latestTimeStamp);  
@@ -417,6 +419,10 @@ void graphnode::removeEdgesLessThanLatestTimeStamp()
 					}
 				}
 			}
+		}
+		else // if node doesn't have edge, remove this node. 
+		{ 
+			nodeandedge.erase(nodeandedge.begin() + i); // deletes the node from graph if the node doesn't have any edges. 
 		}
 	}
 }
