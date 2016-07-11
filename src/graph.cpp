@@ -123,306 +123,324 @@ bool compareTimeStamps(timeStamp t1, timeStamp t2)
 
 bool graphnode::already_in(string key)
 {
-	for (int i = 0; i < nodeandedge.size(); ++i)
-	{
-		if (nodeandedge[i]->data == key)
-			return true;
-	}
-	return false; 
+    for (int i = 0; i < nodeandedge.size(); ++i)
+    {
+        if (nodeandedge[i]->data == key)
+            return true;
+    }
+    return false;
 }
 
 bool graphnode::already_edge(string key, string link)
 {
-	for (int i = 0; i < nodeandedge.size(); ++i)
-	{
-		if (nodeandedge[i]->data == key)
-		{
-			for (node * j = nodeandedge[i]; j != NULL; j = j->next)
-			{
-				if (j->data == link)
-				{
-					return true; 
-				}
-			}
-		}
-	}
-	return false;
+    for (int i = 0; i < nodeandedge.size(); ++i)
+    {
+        if (nodeandedge[i]->data == key)
+        {
+            for (node * j = nodeandedge[i]; j != NULL; j = j->next)
+            {
+                if (j->data == link)
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 void graphnode::insert_vertex(string key)
 {
-	if (!already_in(key))
-	{
-		nodeandedge.push_back(new node(key, NULL));
-		//printf("Inserted vertex \n"); 
-	}
-	else
-	{
-		//printf("Already In ! \n"); 
-		return; 
-	}
+    if (!already_in(key))
+    {
+        nodeandedge.push_back(new node(key, NULL));
+        //printf("Inserted vertex \n");
+    }
+    else
+    {
+        //printf("Already In ! \n");
+        return;
+    }
 }
 
-// undirected, so both vertices form an edge with each other 
+// undirected, so both vertices form an edge with each other
 void graphnode::add_edge(string key, string link)
 {
-	if (!already_in(key))
-	{
-		this->insert_vertex(key); 
-	}
-	if (!already_in(link))
-	{
-		this->insert_vertex(link); 
-	}
+    if (!already_in(key))
+    {
+        this->insert_vertex(key);
+    }
+    if (!already_in(link))
+    {
+        this->insert_vertex(link);
+    }
 
-	if (already_in(key) && already_in(link) && !already_edge(key, link) && isWithin60(timestamps[timestamps.size()-1],latestTimeStamp))
-	{
-		// form first edge
-		for (int i = 0; i < nodeandedge.size(); ++i)
-		{
-			if (nodeandedge[i]->data == key)
-			{
-				for (node * j = nodeandedge[i]; j != NULL; j = j->next)
-				{
-					if (j->next == NULL)
-					{
-						j->next = new node(link, NULL); 
-						add_timestamp(j->next, timestamps[timestamps.size() - 1]); 
-						printf("Added Edge. \n");
-						break; 
-					}
-				}
-			}
-		}
-		// form second edge
-		for (int i = 0; i < nodeandedge.size(); ++i)
-		{
-			if (nodeandedge[i]->data == link)
-			{
-				for (node * j = nodeandedge[i]; j != NULL; j = j->next)
-				{
-					if (j->next == NULL)
-					{
-						j->next = new node(key, NULL); 		
-						add_timestamp(j->next, timestamps[timestamps.size() - 1]);
-						printf("Added Edge. \n"); 
-						break; 
-					}
-				}
-			}
-		}
-		return; 
-	}
-	else
-	{
-		return; 
-	}
+    if (already_in(key) && already_in(link) && !already_edge(key, link) && isWithin60(timestamps[timestamps.size()-1],latestTimeStamp)) //&& isWithin60(timestamps[timestamps.size()-1],latestTimeStamp)
+    {
+        // form first edge
+        for (int i = 0; i < nodeandedge.size(); ++i)
+        {
+            if (nodeandedge[i]->data == key)
+            {
+                for (node * j = nodeandedge[i]; j != NULL; j = j->next)
+                {
+                    if (j->next == NULL)
+                    {
+                        j->next = new node(link, NULL);
+                        add_timestamp(j->next, timestamps[timestamps.size() - 1]);
+                        std::cout << "added edge " << key << " " << link << std::endl;
+                        break;
+                    }
+                }
+            }
+        }
+        // form second edge
+        for (int i = 0; i < nodeandedge.size(); ++i)
+        {
+            if (nodeandedge[i]->data == link)
+            {
+                for (node * j = nodeandedge[i]; j != NULL; j = j->next)
+                {
+                    if (j->next == NULL)
+                    {
+                        j->next = new node(key, NULL);
+                        add_timestamp(j->next, timestamps[timestamps.size() - 1]);
+                        std::cout << "added edge " << link << " " << key << std::endl;
+                        break;
+                    }
+                }
+            }
+        }
+        return;
+    }
+    else
+    {
+        return;
+    }
 }
 
 int graphnode::numberOfVerticies()
 {
-	return nodeandedge.size(); 
+    return nodeandedge.size();
 }
 
 void graphnode::delete_edge(string key, string link)
 {
-	if (already_edge(key, link))
-	{ // then delete the edges. 
-		// First delete edge between key and link
-		for (int i = 0; i < nodeandedge.size(); ++i)
-		{
-			if (nodeandedge[i]->data == key && nodeandedge[i]->next != NULL)
-			{
-				node * prev = nodeandedge[i]; 
-				for (node * j = nodeandedge[i]->next; j != NULL; j = j->next)
-				{
-					if (j->data == link)
-					{
-						// 2 cases, j is either the END of the linked list (just set it to null) or it is not. Then we set prev->next = j->next. Then delete j. 
-						if (j->next == NULL)
-						{
-							std::cout << "deleting link between: " << key << " " << link << std::endl;
-							node * temp = prev->next; 
-							prev->next = NULL; 
-							delete temp->timestamp; 
-							delete temp; 
+    if (already_edge(key, link))
+    { // then delete the edges.
+        // First delete edge between key and link
+        for (int i = 0; i < nodeandedge.size(); ++i)
+        {
+            if (nodeandedge[i]->data == key && nodeandedge[i]->next != NULL)
+            {
+                node * prev = nodeandedge[i];
+                for (node * j = nodeandedge[i]->next; j != NULL; j = j->next)
+                {
+                    if (j->data == link)
+                    {
+                        // 2 cases, j is either the END of the linked list (just set it to null) or it is not. Then we set prev->next = j->next. Then delete j.
+                        if (j->next == NULL)
+                        {
+                            std::cout << "deleting link between: " << key << " " << link << std::endl;
+                            node * temp = prev->next;
+                            prev->next = NULL;
+                            delete temp->timestamp;
+                            delete temp;
 
-							break;
-						}
-						else
-						{
-							std::cout << "deleting link between: " << key << " " << link << std::endl; 
-							node * temp = prev; 
-							prev = prev->next; 
-							temp->next = j->next; 
-							j = j->next; 
-							delete prev->timestamp; 
-							delete prev; 
+                            break;
+                        }
+                        else
+                        {
+                            std::cout << "deleting link between: " << key << " " << link << std::endl;
+                            node * temp = prev;
+                            prev = prev->next;
+                            temp->next = j->next;
+                            j = j->next;
+                            delete prev->timestamp;
+                            delete prev;
 
-							break; 
-						}
-						break; 
-					}
-					prev = prev->next; 
-				}
-				break; 
-			}
-		}
+                            break;
+                        }
+                        break;
+                    }
+                    prev = prev->next;
+                }
+                break;
+            }
+        }
 
-		// Second, delete edge between link and key. 
-		for (int i = 0; i < nodeandedge.size(); ++i)
-		{
-			if (nodeandedge[i]->data == link && nodeandedge[i]->next != NULL)
-			{
-				node * prev = nodeandedge[i]; 
-				for (node * j = nodeandedge[i]->next; j != NULL; j = j->next)
-				{
-					if (j->data == key)
-					{
-						if (j->next == NULL)
-						{
-							std::cout << "deleting link between: " << link << " " << key << std::endl;
-							node * temp = prev->next;
-							prev->next = NULL;
-							delete temp->timestamp; 
-							delete temp;
-	
-							break;
-						}
-						else
-						{
-							std::cout << "deleting link between: " << link << " " << key << std::endl;
-							node * temp = prev;
-							prev = prev->next;
-							temp->next = j->next;
-							j = j->next;
-							delete prev->timestamp; 
-							delete prev;
+        // Second, delete edge between link and key.
+        for (int i = 0; i < nodeandedge.size(); ++i)
+        {
+            if (nodeandedge[i]->data == link && nodeandedge[i]->next != NULL)
+            {
+                node * prev = nodeandedge[i];
+                for (node * j = nodeandedge[i]->next; j != NULL; j = j->next)
+                {
+                    if (j->data == key)
+                    {
+                        if (j->next == NULL)
+                        {
+                            std::cout << "deleting link between: " << link << " " << key << std::endl;
+                            node * temp = prev->next;
+                            prev->next = NULL;
+                            delete temp->timestamp;
+                            delete temp;
 
-							break;
-						}
-						break; 
-					}
-					prev = prev->next; 
-				}
-				break; 
-			}
-		}
-	}
-	else
-	{
-		printf("An Edge Does not exist between these 2 keys \n");
-		return; 
-	}
+                            break;
+                        }
+                        else
+                        {
+                            std::cout << "deleting link between: " << link << " " << key << std::endl;
+                            node * temp = prev;
+                            prev = prev->next;
+                            temp->next = j->next;
+                            j = j->next;
+                            delete prev->timestamp;
+                            delete prev;
+
+                            break;
+                        }
+                        break;
+                    }
+                    prev = prev->next;
+                }
+                break;
+            }
+        }
+    }
+    else
+    {
+        printf("An Edge Does not exist between these 2 keys \n");
+        return;
+    }
 }
 
 
-// Count every edge in each node and put into vector then sort them. 
+// Count every edge in each node and put into vector then sort them.
 void graphnode::getDegrees()
 {
-	int count = 0; 
-	degreeCounter = vector<int>(); // clear the vector before every count So that each time this fcn is called we have the updated degrees 
-	// 1st gather number of edges per node. 
-	for (int i = 0; i < nodeandedge.size(); ++i)
-	{
-		if (nodeandedge[i]->next != NULL)
-		{
-			count = 0; 
-			for (node * j = nodeandedge[i]->next; j != NULL; j = j->next)
-			{
-				++count; 
-			}
-			degreeCounter.push_back(count); 
-		}
-	}
+    int count = 0;
+    degreeCounter = vector<int>(); // clear the vector before every count So that each time this fcn is called we have the updated degrees
+    // 1st gather number of edges per node.
+    for (int i = 0; i < nodeandedge.size(); ++i)
+    {
+        if (nodeandedge[i]->next != NULL)
+        {
+            count = 0;
+            for (node * j = nodeandedge[i]->next; j != NULL; j = j->next)
+            {
+                ++count;
+            }
+            degreeCounter.push_back(count);
+        }
+    }
 
-	
+
 }
 
 // get Median degree
 void graphnode::storeMedian()
 {
-	// first sort the degree array
-	std::sort(degreeCounter.begin(), degreeCounter.end());
+    // first sort the degree array
+    std::sort(degreeCounter.begin(), degreeCounter.end());
 
-	double median; 
-	int midpt = (degreeCounter.size() - 1) / 2;
-	if (degreeCounter.size() % 2 == 0)
-	{
-		median = (double(degreeCounter[midpt]) + double(degreeCounter[midpt + 1])) / 2.0;
-		rollingMedian.push_back(median);
-	}
-	else
-	{
-		median = double(degreeCounter[midpt]) / 2.0; 
-		rollingMedian.push_back(median); 
-	}
+    /*
+    for(int i = 0; i < degreeCounter.size(); ++i)
+    {
+        std::cout << degreeCounter[i] << " ";
+    }
+    std::cout << std::endl;
+    */
+
+    double median;
+    int midpt = (degreeCounter.size() - 1) / 2;
+    if (degreeCounter.size() % 2 == 0)
+    {
+        median = (double(degreeCounter[midpt]) + double(degreeCounter[midpt + 1])) / 2.0;
+        rollingMedian.push_back(median);
+    }
+    else
+    {
+        median = double(degreeCounter[midpt]);
+        rollingMedian.push_back(median);
+    }
 }
 
 void graphnode::printLatestMedian()
 {
-	std::cout << rollingMedian[rollingMedian.size() - 1] << std::endl; 
+    std::cout << rollingMedian[rollingMedian.size() - 1] << std::endl;
 }
 
 double graphnode::getLatestMedian()
 {
-	return rollingMedian[rollingMedian.size() - 1]; 
+    return rollingMedian[rollingMedian.size() - 1];
 }
 
 void graphnode::add_timestamp(node * attachToThis, string timestamp)
 {
-	attachToThis->timestamp = new node(timestamp, NULL); 
+    attachToThis->timestamp = new node(timestamp, NULL);
 }
 
 void graphnode::store_timestamp(string timestamp)
 {
-	if (timestamps.size() == 0)
-	{
-		timestamps.push_back(timestamp);
-		latestTimeStamp = timestamp;
-	}
-	else
-	{
-		timestamps.push_back(timestamp); 
-		if (compareTimeStamps(latestTimeStamp, timestamp)) // if timestamp > latestTimeStamp
-		{
-			latestTimeStamp = timestamp; 
-		}
-	}
-		//std::cout << latestTimeStamp << std::endl; 
+    if (timestamps.size() == 0)
+    {
+        timestamps.push_back(timestamp);
+        latestTimeStamp = timestamp;
+    }
+    else
+    {
+        timestamps.push_back(timestamp);
+        if (compareTimeStamps(latestTimeStamp, timestamp)) // if timestamp > latestTimeStamp
+        {
+            latestTimeStamp = timestamp;
+        }
+    }
+        //std::cout << latestTimeStamp << std::endl;
 }
 
 
 
 void graphnode::removeEdgesLessThanLatestTimeStamp()
 {
-	timeStamp latest(latestTimeStamp);  
-	for (int i = 0; i < nodeandedge.size(); ++i)
-	{
-		if (nodeandedge[i]->next != NULL)
-		{
-			for (node * j = nodeandedge[i]->next; j != NULL; j = j->next) // go through each edge and make sure its within 60 seconds of latest timestamp. If it isn't delete the edge
-			{
-				timeStamp check(j->timestamp->data); 
-				if (!isWithin60(check, latest))
-				{ 
-					if (j->next == NULL)
-					{
-						this->delete_edge(nodeandedge[i]->data, j->data); 
-						break; 
-					}
-					else
-					{
-						node * temp = j->next; 
-						this->delete_edge(nodeandedge[i]->data, j->data); 
-						j = temp; 
-					}
-				}
-			}
-		}
-		else // if node doesn't have edge, remove this node. 
-		{ 
-			nodeandedge.erase(nodeandedge.begin() + i); // deletes the node from graph if the node doesn't have any edges. 
-		}
-	}
+    timeStamp latest(latestTimeStamp);
+
+
+    for(int i = 0; i < nodeandedge.size(); ++i)
+    {
+        if(nodeandedge[i]->next != NULL)
+        {
+            node * j = nodeandedge[i]->next;
+            while(j != NULL)
+            {
+                timeStamp check(j->timestamp->data);
+                if(!isWithin60(check, latest))
+                {
+                    if(j->next == NULL)
+                    {
+                        this->delete_edge(nodeandedge[i]->data, j->data);
+                        break;
+                    }
+                    else
+                    {
+                        node * temp = j->next;
+                        this->delete_edge(nodeandedge[i]->data, j->data);
+                        j = temp;
+                    }
+                }
+                else
+                {
+                    j = j->next;
+                }
+            }
+        }
+    }
+    // check all nodes to see if they have edges
+    // if they don't delete the node from the graph
+    for(int i = 0; i < nodeandedge.size(); ++i)
+    {
+        if(nodeandedge[i]->next == NULL)
+            nodeandedge.erase(nodeandedge.begin() + i);
+    }
 }
